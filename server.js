@@ -14,10 +14,12 @@ const PORT = process.env.PORT || 5000;
 // =====================================
 
 const movieRoutes = require("./src/routes/movie.routes");
+const theatherRoutes=require("./src/routes/theatre.routes");
 app.use(express.json());
 
 
 app.use("/api/movies", movieRoutes);
+app.use("/api/theather",theatherRoutes);
 // =====================================
 // ROOT ROUTE
 // =====================================

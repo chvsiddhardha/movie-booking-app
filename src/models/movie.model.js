@@ -1,22 +1,30 @@
-const {pool}=require("../config/database");
+const { pool } = require("../config/database");
 
-exports.getAllMovies=async()=>{
-    const result=await pool.query(
-        `SELECT * FROM movies ORDER BY id`
+
+// GET ALL MOVIES
+exports.getAllMovies = async () => {
+    const result = await pool.query(
+        "SELECT * FROM movies ORDER BY id"
     );
+
     return result.rows;
 };
 
-exports.getMoviesById=async(movieId)=>{
-    const result=await pool.query(
+
+// GET MOVIE BY ID
+exports.getMovieById = async (movieId) => {
+    const result = await pool.query(
         `SELECT * FROM movies
-        WHERE id=$1`,
+         WHERE id = $1`,
         [movieId]
     );
+
     return result.rows[0];
 };
 
-exports.createMovie=async(
+
+// CREATE MOVIE
+exports.createMovie = async (
     title,
     description,
     language,
@@ -24,11 +32,11 @@ exports.createMovie=async(
     genre,
     release_date,
     poster_url
-)=>{
-    const result=await pool.query(
+) => {
+    const result = await pool.query(
         `INSERT INTO movies
-        (title,description,language,duration,genre,release_date,poster_url)
-        VALUES ($1,$2,$3,$4,$5,$6,$7)
+        (title, description, language, duration, genre, release_date, poster_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING *`,
         [
             title,
@@ -40,9 +48,12 @@ exports.createMovie=async(
             poster_url
         ]
     );
+
     return result.rows[0];
 };
 
+
+// UPDATE MOVIE
 exports.updateMovie = async (
     movieId,
     title,
@@ -80,6 +91,7 @@ exports.updateMovie = async (
 };
 
 
+// DELETE MOVIE
 exports.deleteMovie = async (movieId) => {
     const result = await pool.query(
         `DELETE FROM movies
