@@ -42,3 +42,51 @@ exports.createMovie=async(
     );
     return result.rows[0];
 };
+
+exports.updateMovie = async (
+    movieId,
+    title,
+    description,
+    language,
+    duration,
+    genre,
+    release_date,
+    poster_url
+) => {
+    const result = await pool.query(
+        `UPDATE movies
+         SET title = $1,
+             description = $2,
+             language = $3,
+             duration = $4,
+             genre = $5,
+             release_date = $6,
+             poster_url = $7
+         WHERE id = $8
+         RETURNING *`,
+        [
+            title,
+            description,
+            language,
+            duration,
+            genre,
+            release_date,
+            poster_url,
+            movieId
+        ]
+    );
+
+    return result.rows[0];
+};
+
+
+exports.deleteMovie = async (movieId) => {
+    const result = await pool.query(
+        `DELETE FROM movies
+         WHERE id = $1
+         RETURNING *`,
+        [movieId]
+    );
+
+    return result.rows[0];
+};
