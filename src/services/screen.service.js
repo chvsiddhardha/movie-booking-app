@@ -1,14 +1,20 @@
-const screenModel=require("../models/screen.model");
+const screenModel = require("../models/screen.model");
 
-exports.getAllScreens=async()=>{
+
+// GET ALL SCREENS
+exports.getAllScreens = async () => {
     return await screenModel.getAllScreens();
 };
 
-exports.getScreenById=async(screenId)=>{
+
+// GET SCREEN BY ID
+exports.getScreenById = async (screenId) => {
     return await screenModel.getScreenById(screenId);
 };
 
-exports.createScreen=async(screenData)=>{
+
+// CREATE SCREEN
+exports.createScreen = async (screenData) => {
     return await screenModel.createScreen(
         screenData.theatre_id,
         screenData.name,
@@ -16,8 +22,10 @@ exports.createScreen=async(screenData)=>{
     );
 };
 
-exports.updateScreen=async(screenId,screenData)=>{
-    return await screenData.updateScreen(
+
+// UPDATE SCREEN
+exports.updateScreen = async (screenId, screenData) => {
+    return await screenModel.updateScreen(
         screenId,
         screenData.theatre_id,
         screenData.name,
@@ -25,6 +33,8 @@ exports.updateScreen=async(screenId,screenData)=>{
     );
 };
 
-exports.deleteScreen=async(screenId)=>{
+
+// DELETE SCREEN
+exports.deleteScreen = async (screenId) => {
     return await screenModel.deleteScreen(screenId);
 };

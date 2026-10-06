@@ -1,69 +1,67 @@
-const {pool} =require("../config/database");
+const screenService = require("../services/screen.service");
 
-exports.getAllScreens =async(req,res)=>{
-    try{
-        const result=await pool.query(
-            `SELECT * FROM screens`
-        );
-        res.json(result.rows);
-    }
-    catch(error){
-        console.error("Error:",error.message);
-        res.json({
-            success:false,
-            message:"Failed to fetch screens"
+// GET ALL SCREENS
+exports.getAllScreens = async (req, res) => {
+    try {
+        const screens = await screenService.getAllScreens();
+
+        res.status(200).json({
+            success: true,
+            screens: screens
         });
-    }
-    
-}
+    } catch (error) {
+        console.error("Error:", error.message);
 
-exports.getScreensById =async (req,res)=>{
-    try{
-        const screenId=req.params.id;
-        const result=await pool.query(
-            `SELECT * FROM screens
-            WHERE id=$1`,
-            [screenId]
-        );
-        res.json(result.rows[0]);
-    }
-    catch(error){
-        console.error("Error:",error.message);
-        res.json({
-            success:false,
-            message:"screen not found"
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch screens"
         });
     }
 };
-exports.createScreen = async (req, res) => {
+
+
+// GET SCREEN BY ID
+exports.getScreenById = async (req, res) => {
     try {
+        const screenId = req.params.id;
 
-        const {
-            theatre_id,
-            name,
-            total_seats
-        } = req.body;
+        const screen = await screenService.getScreenById(screenId);
 
-        const result = await pool.query(
-            `INSERT INTO screens
-            (theatre_id, name, total_seats)
-            VALUES($1, $2, $3)
-            RETURNING *`,
-            [
-                theatre_id,
-                name,
-                total_seats
-            ]
-        );
+        if (!screen) {
+            return res.status(404).json({
+                success: false,
+                message: "Screen not found"
+            });
+        }
 
-        res.status(201).json({
+        res.status(200).json({
             success: true,
-            message: "Created screen successfully",
-            screen: result.rows[0]
+            screen: screen
         });
 
     } catch (error) {
+        console.error("Error:", error.message);
 
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch screen"
+        });
+    }
+};
+
+
+// CREATE SCREEN
+exports.createScreen = async (req, res) => {
+    try {
+        const screen = await screenService.createScreen(req.body);
+
+        res.status(201).json({
+            success: true,
+            message: "Screen created successfully",
+            screen: screen
+        });
+
+    } catch (error) {
         console.error("Error:", error.message);
 
         res.status(500).json({
@@ -72,54 +70,68 @@ exports.createScreen = async (req, res) => {
         });
     }
 };
-exports.updateScreen=async(req,res)=>{
-    try{
-        const screenId=req.params.id;
-        const{
-            theatre_id,
-            name,
-            total_seats
-        }=req.body
-        const result=await pool.query(
-            `UPDATE screens
-            SET theatre_id=$1,
-                name=$2,
-                total_seats=$3
-            WHERE id=$4
-            RETURNING *`
-        ,[theatre_id,name,total_seats,screenId]);
-        res.json({
-            success:true,
-            message:"Updated screen successfully"
+
+
+// UPDATE SCREEN
+exports.updateScreen = async (req, res) => {
+    try {
+        const screenId = req.params.id;
+
+        const screen = await screenService.updateScreen(
+            screenId,
+            req.body
+        );
+
+        if (!screen) {
+            return res.status(404).json({
+                success: false,
+                message: "Screen not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Screen updated successfully",
+            screen: screen
         });
-    }
-    catch(error){
-        console.error("Error:",error.message);
-        res.json({
-            success:false,
-            message:"Failed to update screen"
+
+    } catch (error) {
+        console.error("Error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to update screen"
         });
     }
 };
 
-exports.deleteScreen=async(req,res)=>{
-    try{
-        const screenId=req.params.id;
-        const result=await pool.query(
-            `DELETE FROM screens
-            WHERE id=$1 RETURNING *`,
-            [screenId]
-        );
-        res.json({
-            success:true,
-            message:"Screen deleted successfully"
+
+// DELETE SCREEN
+exports.deleteScreen = async (req, res) => {
+    try {
+        const screenId = req.params.id;
+
+        const screen = await screenService.deleteScreen(screenId);
+
+        if (!screen) {
+            return res.status(404).json({
+                success: false,
+                message: "Screen not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: "Screen deleted successfully",
+            screen: screen
         });
-    }
-    catch(error){
-        console.error("Error:",error.message);
-        res.json({
-            success:false,
-            message:"Failed to delete screen"
+
+    } catch (error) {
+        console.error("Error:", error.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete screen"
         });
     }
 };
