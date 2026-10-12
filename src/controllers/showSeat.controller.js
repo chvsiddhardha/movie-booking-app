@@ -151,3 +151,77 @@ exports.deleteShowSeat = async (req, res) => {
         });
     }
 };
+
+
+
+exports.getSeatsByShowId = async (req, res) => {
+    try {
+        const showId = Number(req.params.showId);
+
+        if (!Number.isInteger(showId) || showId <= 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid show ID"
+            });
+        }
+
+        const seats = await showSeatService.getSeatsByShowId(showId);
+
+        res.status(200).json({
+            success: true,
+            show_id: showId,
+            seats
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+exports.getPricePreview = async (req, res) => {
+    try {
+        const { showId, showSeatIds } = req.body;
+
+        // Validate the request body
+        if (
+            !Number.isInteger(showId) ||
+            showId <= 0 ||
+            !Array.isArray(showSeatIds) ||
+            showSeatIds.length === 0 ||
+            !showSeatIds.every(
+                (id) => Number.isInteger(id) && id > 0
+            )
+        ) {
+            return res.status(400).json({
+                success: false,
+                message: "Provide a valid showId and showSeatIds array"
+            });
+        }
+
+        // Call the service
+        const preview = await showSeatService.getPricePreview(
+            showId,
+            showSeatIds
+        );
+
+        return res.status(200).json({
+            success: true,
+            showId,
+            ...preview
+        });
+    } catch (error) {
+        const statusCode =
+            error.message.includes("not belong") ||
+            error.message.includes("not available")
+                ? 400
+                : 500;
+
+        return res.status(statusCode).json({
+            success: false,
+            message: error.message
+        });
+    }
+};

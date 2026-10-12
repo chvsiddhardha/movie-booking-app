@@ -29,5 +29,13 @@ router.delete(
     "/:id",
     showSeatController.deleteShowSeat
 );
+router.get(
+    "/show/:showId/seats",
+    showSeatController.getSeatsByShowId
+);
 
+router.post(
+    "/price-preview",
+    showSeatController.getPricePreview
+); 
 module.exports = router;

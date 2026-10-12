@@ -57,3 +57,42 @@ exports.deleteShowSeat=async(showSeatId)=>{
     return result.rows[0];
 };
 
+
+exports.getSeatsByShowId = async (showId) => {
+    const result = await pool.query(
+        `SELECT
+            ss.id AS show_seat_id,
+            s.seat_number,
+            s.seat_type,
+            ss.price,
+            ss.status
+         FROM show_seats AS ss
+         JOIN seats AS s
+            ON ss.seat_id = s.id
+         WHERE ss.show_id = $1
+         ORDER BY s.seat_number`,
+        [showId]
+    );
+
+    return result.rows;
+};
+
+exports.getSelectedSeatsForPreview = async (showId, showSeatIds) => {
+    const result = await pool.query(
+        `SELECT
+            ss.id AS show_seat_id,
+            s.seat_number,
+            s.seat_type,
+            ss.price,
+            ss.status
+         FROM show_seats AS ss
+         JOIN seats AS s
+            ON ss.seat_id = s.id
+         WHERE ss.show_id = $1
+           AND ss.id = ANY($2::int[])
+         ORDER BY s.seat_number`,
+        [showId, showSeatIds]
+    );
+
+    return result.rows;
+};

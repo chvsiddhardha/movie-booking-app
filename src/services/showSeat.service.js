@@ -26,3 +26,33 @@ exports.updateShowSeat=async(showSeatId, showSeatData)=>{
         showSeatData.status
     );
 };
+
+
+exports.getSeatsByShowId = async (showId) => {
+    return showSeatModel.getSeatsByShowId(showId);
+};
+
+exports.getPricePreview=async(showId,showSeatIds)=>{
+    const seats=await showSeatModel.getSelectedSeatsForPreview(showId,showSeatIds);
+
+    if(seats.length!==showSeatIds.length){
+        throw new Error("Some selected seats do not belong to this show");
+    }
+
+    const unavailabaleSeats=seats.filter(
+        (seat)=>seat.status!=="AVAILABLE"
+    );
+    if(unavailabaleSeats.length>0){
+        throw new Error("Some selected seats are not available");
+    }
+
+    const totalAmount=seats.reduce(
+        (total,seat)=>total+Number(seat.price),
+        0
+    );
+    return{
+        seats,
+        seatCount:seats.length,
+        totalAmount
+    }
+}
